@@ -149,109 +149,9 @@ startService (){
        	fi
 }
 
-installSchemaRegistryService () {
-       	
-       	echo "*********************************Creating REGISTRY service..."
-       	# Create Schema Registry service
-       	curl -u admin:admin -H "X-Requested-By:ambari" -i -X POST http://$AMBARI_HOST:8080/api/v1/clusters/$CLUSTER_NAME/services/REGISTRY
 
-       	sleep 2
-       	echo "*********************************Adding REGISTRY SERVER component..."
-       	# Add REGISTRY SERVER component to service
-       	curl -u admin:admin -H "X-Requested-By:ambari" -i -X POST http://$AMBARI_HOST:8080/api/v1/clusters/$CLUSTER_NAME/services/REGISTRY/components/REGISTRY_SERVER
 
-       	sleep 2
-       	echo "*********************************Creating REGISTRY configuration..."
 
-       	# Create and apply configuration
-		/var/lib/ambari-server/resources/scripts/configs.sh set $AMBARI_HOST $CLUSTER_NAME registry-common $ROOT_PATH/CloudBreakArtifacts/hdf-config/registry-config/registry-common.json
-
-		/var/lib/ambari-server/resources/scripts/configs.sh set $AMBARI_HOST $CLUSTER_NAME registry-env $ROOT_PATH/CloudBreakArtifacts/hdf-config/registry-config/registry-env.json
-		
-		/var/lib/ambari-server/resources/scripts/configs.sh set $AMBARI_HOST $CLUSTER_NAME registry-log4j $ROOT_PATH/CloudBreakArtifacts/hdf-config/registry-config/registry-log4j.json
-		
-       	echo "*********************************Adding REGISTRY SERVER role to Host..."
-       	# Add REGISTRY_SERVER role to Ambari Host
-       	curl -u admin:admin -H "X-Requested-By:ambari" -i -X POST http://$AMBARI_HOST:8080/api/v1/clusters/$CLUSTER_NAME/hosts/$AMBARI_HOST/host_components/REGISTRY_SERVER
-
-       	sleep 30
-       	echo "*********************************Installing REGISTRY Service"
-       	# Install REGISTRY Service
-       	TASKID=$(curl -u admin:admin -H "X-Requested-By:ambari" -i -X PUT -d '{"RequestInfo": {"context" :"Install Schema Registry"}, "Body": {"ServiceInfo": {"maintenance_state" : "OFF", "state": "INSTALLED"}}}' http://$AMBARI_HOST:8080/api/v1/clusters/$CLUSTER_NAME/services/REGISTRY | grep "id" | grep -Po '([0-9]+)')
-		
-		sleep 2       	
-       	if [ -z $TASKID ]; then
-       		until ! [ -z $TASKID ]; do
-       			TASKID=$(curl -u admin:admin -H "X-Requested-By:ambari" -i -X PUT -d '{"RequestInfo": {"context" :"Install Schema Registry"}, "Body": {"ServiceInfo": {"maintenance_state" : "OFF", "state": "INSTALLED"}}}' http://$AMBARI_HOST:8080/api/v1/clusters/$CLUSTER_NAME/services/REGISTRY | grep "id" | grep -Po '([0-9]+)')
-       		 	echo "*********************************AMBARI TaskID " $TASKID
-       		done
-       	fi
-       	
-       	echo "*********************************AMBARI TaskID " $TASKID
-       	sleep 2
-       	LOOPESCAPE="false"
-       	until [ "$LOOPESCAPE" == true ]; do
-               	TASKSTATUS=$(curl -u admin:admin -X GET http://$AMBARI_HOST:8080/api/v1/clusters/$CLUSTER_NAME/requests/$TASKID | grep "request_status" | grep -Po '([A-Z]+)')
-               	if [ "$TASKSTATUS" == COMPLETED ]; then
-                       	LOOPESCAPE="true"
-               	fi
-               	echo "*********************************Task Status" $TASKSTATUS
-               	sleep 2
-       	done
-}
-
-installStreamlineService () {
-       	
-       	echo "*********************************Creating STREAMLINE service..."
-       	# Create Streamline service
-       	curl -u admin:admin -H "X-Requested-By:ambari" -i -X POST http://$AMBARI_HOST:8080/api/v1/clusters/$CLUSTER_NAME/services/STREAMLINE
-
-       	sleep 2
-       	echo "*********************************Adding STREAMLINE SERVER component..."
-       	# Add STREAMLINE SERVER component to service
-       	curl -u admin:admin -H "X-Requested-By:ambari" -i -X POST http://$AMBARI_HOST:8080/api/v1/clusters/$CLUSTER_NAME/services/STREAMLINE/components/STREAMLINE_SERVER
-
-       	sleep 2
-       	echo "*********************************Creating STREAMLINE configuration..."
-
-       	# Create and apply configuration
-		/var/lib/ambari-server/resources/scripts/configs.sh set $AMBARI_HOST $CLUSTER_NAME streamline-common $ROOT_PATH/CloudBreakArtifacts/hdf-config/streamline-config/streamline-common.json
-
-		/var/lib/ambari-server/resources/scripts/configs.sh set $AMBARI_HOST $CLUSTER_NAME streamline-env $ROOT_PATH/CloudBreakArtifacts/hdf-config/streamline-config/streamline-env.json
-
-	/var/lib/ambari-server/resources/scripts/configs.sh set $AMBARI_HOST $CLUSTER_NAME streamline-log4j $ROOT_PATH/CloudBreakArtifacts/hdf-config/streamline-config/streamline-log4j.json
-
-		/var/lib/ambari-server/resources/scripts/configs.sh set $AMBARI_HOST $CLUSTER_NAME streamline_jaas_conf $ROOT_PATH/CloudBreakArtifacts/hdf-config/streamline-config/streamline_jaas_conf.json
-		
-       	echo "*********************************Adding STREAMLINE SERVER role to Host..."
-       	# Add STREAMLINE SERVER role to Ambari Host
-       	curl -u admin:admin -H "X-Requested-By:ambari" -i -X POST http://$AMBARI_HOST:8080/api/v1/clusters/$CLUSTER_NAME/hosts/$AMBARI_HOST/host_components/STREAMLINE_SERVER
-
-       	sleep 30
-       	echo "*********************************Installing STREAMLINE Service"
-       	# Install STREAMLINE Service
-       	TASKID=$(curl -u admin:admin -H "X-Requested-By:ambari" -i -X PUT -d '{"RequestInfo": {"context" :"Install SAM"}, "Body": {"ServiceInfo": {"maintenance_state" : "OFF", "state": "INSTALLED"}}}' http://$AMBARI_HOST:8080/api/v1/clusters/$CLUSTER_NAME/services/STREAMLINE | grep "id" | grep -Po '([0-9]+)')
-		
-		sleep 2       	
-       	if [ -z $TASKID ]; then
-       		until ! [ -z $TASKID ]; do
-       			TASKID=$(curl -u admin:admin -H "X-Requested-By:ambari" -i -X PUT -d '{"RequestInfo": {"context" :"Install SAM"}, "Body": {"ServiceInfo": {"maintenance_state" : "OFF", "state": "INSTALLED"}}}' http://$AMBARI_HOST:8080/api/v1/clusters/$CLUSTER_NAME/services/STREAMLINE | grep "id" | grep -Po '([0-9]+)')
-       		 	echo "*********************************AMBARI TaskID " $TASKID
-       		done
-       	fi
-       	
-       	echo "*********************************AMBARI TaskID " $TASKID
-       	sleep 2
-       	LOOPESCAPE="false"
-       	until [ "$LOOPESCAPE" == true ]; do
-               	TASKSTATUS=$(curl -u admin:admin -X GET http://$AMBARI_HOST:8080/api/v1/clusters/$CLUSTER_NAME/requests/$TASKID | grep "request_status" | grep -Po '([A-Z]+)')
-               	if [ "$TASKSTATUS" == COMPLETED ]; then
-                       	LOOPESCAPE="true"
-               	fi
-               	echo "*********************************Task Status" $TASKSTATUS
-               	sleep 2
-       	done
-}
 
 installNifiService () {
        	echo "*********************************Creating NIFI service..."
@@ -343,131 +243,6 @@ waitForNifiServlet () {
        	done
 }
 
-installDruidService () {
-       	
-       	echo "*********************************Creating DRUID service..."
-       	# Create Druid service
-       	curl -u admin:admin -H "X-Requested-By:ambari" -i -X POST http://$AMBARI_HOST:8080/api/v1/clusters/$CLUSTER_NAME/services/DRUID
-
-       	sleep 2
-       	echo "*********************************Adding DRUID components..."
-       	# Add DRUID BROKER component to service
-       	curl -u admin:admin -H "X-Requested-By:ambari" -i -X POST http://$AMBARI_HOST:8080/api/v1/clusters/$CLUSTER_NAME/services/DRUID/components/DRUID_BROKER
-		sleep 2
-		# Add DRUID COORDINATOR component to service
-       	curl -u admin:admin -H "X-Requested-By:ambari" -i -X POST http://$AMBARI_HOST:8080/api/v1/clusters/$CLUSTER_NAME/services/DRUID/components/DRUID_COORDINATOR
-       	# Add DRUID HISTORICAL component to service
-       	curl -u admin:admin -H "X-Requested-By:ambari" -i -X POST http://$AMBARI_HOST:8080/api/v1/clusters/$CLUSTER_NAME/services/DRUID/components/DRUID_HISTORICAL
-       	# Add DRUID MIDDLEMANAGER component to service
-       	curl -u admin:admin -H "X-Requested-By:ambari" -i -X POST http://$AMBARI_HOST:8080/api/v1/clusters/$CLUSTER_NAME/services/DRUID/components/DRUID_MIDDLEMANAGER
-		# Add DRUID OVERLORD component to service
-       	curl -u admin:admin -H "X-Requested-By:ambari" -i -X POST http://$AMBARI_HOST:8080/api/v1/clusters/$CLUSTER_NAME/services/DRUID/components/DRUID_OVERLORD
-       	# Add DRUID ROUTER component to service
-       	curl -u admin:admin -H "X-Requested-By:ambari" -i -X POST http://$AMBARI_HOST:8080/api/v1/clusters/$CLUSTER_NAME/services/DRUID/components/DRUID_ROUTER
-       	# Add DRUID SUPERSET component to service
-       	curl -u admin:admin -H "X-Requested-By:ambari" -i -X POST http://$AMBARI_HOST:8080/api/v1/clusters/$CLUSTER_NAME/services/DRUID/components/DRUID_SUPERSET
-		
-       	sleep 2
-       	echo "*********************************Creating DRUID configuration..."
-
-       	# Create and apply configuration
-       	/var/lib/ambari-server/resources/scripts/configs.sh set $AMBARI_HOST $CLUSTER_NAME druid-broker $ROOT_PATH/CloudBreakArtifacts/hdf-config/druid-config/druid-broker.json
-		
-		/var/lib/ambari-server/resources/scripts/configs.sh set $AMBARI_HOST $CLUSTER_NAME druid-common $ROOT_PATH/CloudBreakArtifacts/hdf-config/druid-config/druid-common.json
-
-		/var/lib/ambari-server/resources/scripts/configs.sh set $AMBARI_HOST $CLUSTER_NAME druid-coordinator $ROOT_PATH/CloudBreakArtifacts/hdf-config/druid-config/druid-coordinator.json
-		
-		/var/lib/ambari-server/resources/scripts/configs.sh set $AMBARI_HOST $CLUSTER_NAME druid-env $ROOT_PATH/CloudBreakArtifacts/hdf-config/druid-config/druid-env.json
-		
-		/var/lib/ambari-server/resources/scripts/configs.sh set $AMBARI_HOST $CLUSTER_NAME druid-historical $ROOT_PATH/CloudBreakArtifacts/hdf-config/druid-config/druid-historical.json
-		
-		/var/lib/ambari-server/resources/scripts/configs.sh set $AMBARI_HOST $CLUSTER_NAME druid-log4j $ROOT_PATH/CloudBreakArtifacts/hdf-config/druid-config/druid-log4j.json
-		
-		/var/lib/ambari-server/resources/scripts/configs.sh set $AMBARI_HOST $CLUSTER_NAME druid-logrotate $ROOT_PATH/CloudBreakArtifacts/hdf-config/druid-config/druid-logrotate.json
-		
-		/var/lib/ambari-server/resources/scripts/configs.sh set $AMBARI_HOST $CLUSTER_NAME druid-middlemanager $ROOT_PATH/CloudBreakArtifacts/hdf-config/druid-config/druid-middlemanager.json
-		
-		/var/lib/ambari-server/resources/scripts/configs.sh set $AMBARI_HOST $CLUSTER_NAME druid-overlord $ROOT_PATH/CloudBreakArtifacts/hdf-config/druid-config/druid-overlord.json
-		
-		/var/lib/ambari-server/resources/scripts/configs.sh set $AMBARI_HOST $CLUSTER_NAME druid-router $ROOT_PATH/CloudBreakArtifacts/hdf-config/druid-config/druid-router.json
-		
-		/var/lib/ambari-server/resources/scripts/configs.sh set $AMBARI_HOST $CLUSTER_NAME druid-superset-env $ROOT_PATH/CloudBreakArtifacts/hdf-config/druid-config/druid-superset-env.json
-		
-		/var/lib/ambari-server/resources/scripts/configs.sh set $AMBARI_HOST $CLUSTER_NAME druid-superset $ROOT_PATH/CloudBreakArtifacts/hdf-config/druid-config/druid-superset.json
-		
-		HOST1=$(getHostByPosition 1)
-		HOST2=$(getHostByPosition 2)
-		HOST3=$(getHostByPosition 3)			
-		
-       	echo "*********************************Adding DRUID BROKER role to Host..."
-       	# Add DRUID BROKER role to Host
-       	curl -u admin:admin -H "X-Requested-By:ambari" -i -X POST http://$AMBARI_HOST:8080/api/v1/clusters/$CLUSTER_NAME/hosts/$HOST1/host_components/DRUID_BROKER
-       	
-       	echo "*********************************Adding DRUID SUPERSET role to Host..."
-       	# Add DRUID SUPERSET role to Host
-       	curl -u admin:admin -H "X-Requested-By:ambari" -i -X POST http://$AMBARI_HOST:8080/api/v1/clusters/$CLUSTER_NAME/hosts/$HOST1/host_components/DRUID_SUPERSET
-       	
-       	echo "*********************************Adding DRUID ROUTER role to Host..."
-       	# Add DRUID BROKER role to Host
-       	curl -u admin:admin -H "X-Requested-By:ambari" -i -X POST http://$AMBARI_HOST:8080/api/v1/clusters/$CLUSTER_NAME/hosts/$HOST2/host_components/DRUID_ROUTER
-       	
-       	echo "*********************************Adding DRUID OVERLORD role to Host..."
-       	# Add DRUID OVERLORD role to Host
-       	curl -u admin:admin -H "X-Requested-By:ambari" -i -X POST http://$AMBARI_HOST:8080/api/v1/clusters/$CLUSTER_NAME/hosts/$HOST2/host_components/DRUID_OVERLORD
-       	
-       	echo "*********************************Adding DRUID COORDINATOR role to Host..."
-       	# Add DRUID COORDINATOR role to Host
-       	curl -u admin:admin -H "X-Requested-By:ambari" -i -X POST http://$AMBARI_HOST:8080/api/v1/clusters/$CLUSTER_NAME/hosts/$HOST3/host_components/DRUID_COORDINATOR
-       	
-       	echo "*********************************Adding DRUID HISTORICAL role to Host..."
-       	# Add DRUID HISTORICAL role to Host
-       	curl -u admin:admin -H "X-Requested-By:ambari" -i -X POST http://$AMBARI_HOST:8080/api/v1/clusters/$CLUSTER_NAME/hosts/$HOST1/host_components/DRUID_HISTORICAL
-		
-		echo "*********************************Adding DRUID HISTORICAL role to Host..."
-       	# Add DRUID HISTORICAL role to Host
-       	curl -u admin:admin -H "X-Requested-By:ambari" -i -X POST http://$AMBARI_HOST:8080/api/v1/clusters/$CLUSTER_NAME/hosts/$HOST2/host_components/DRUID_HISTORICAL
-       	
-       	echo "*********************************Adding DRUID HISTORICAL role to Host..."
-       	# Add DRUID HISTORICAL role to Host
-       	curl -u admin:admin -H "X-Requested-By:ambari" -i -X POST http://$AMBARI_HOST:8080/api/v1/clusters/$CLUSTER_NAME/hosts/$HOST3/host_components/DRUID_HISTORICAL
-       	
-       	echo "*********************************Adding DRUID MIDDLEMANAGER role to Host..."
-       	# Add DRUID MIDDLEMANAGER role to Host
-       	curl -u admin:admin -H "X-Requested-By:ambari" -i -X POST http://$AMBARI_HOST:8080/api/v1/clusters/$CLUSTER_NAME/hosts/$HOST1/host_components/DRUID_MIDDLEMANAGER
-       	
-       	echo "*********************************Adding DRUID MIDDLEMANAGER role to Host..."
-       	# Add DRUID MIDDLEMANAGER role to Host
-       	curl -u admin:admin -H "X-Requested-By:ambari" -i -X POST http://$AMBARI_HOST:8080/api/v1/clusters/$CLUSTER_NAME/hosts/$HOST2/host_components/DRUID_MIDDLEMANAGER
-       	
-       	echo "*********************************Adding DRUID MIDDLEMANAGER role to Host..."
-       	# Add DRUID MIDDLEMANAGER role to Host
-       	curl -u admin:admin -H "X-Requested-By:ambari" -i -X POST http://$AMBARI_HOST:8080/api/v1/clusters/$CLUSTER_NAME/hosts/$HOST3/host_components/DRUID_MIDDLEMANAGER
-
-       	sleep 30
-       	echo "*********************************Installing DRUID Service"
-       	# Install DRUID Service
-       	TASKID=$(curl -u admin:admin -H "X-Requested-By:ambari" -i -X PUT -d '{"RequestInfo": {"context" :"Install Druid"}, "Body": {"ServiceInfo": {"maintenance_state" : "OFF", "state": "INSTALLED"}}}' http://$AMBARI_HOST:8080/api/v1/clusters/$CLUSTER_NAME/services/DRUID | grep "id" | grep -Po '([0-9]+)')
-		
-		sleep 2       	
-       	if [ -z $TASKID ]; then
-       		until ! [ -z $TASKID ]; do
-       			TASKID=$(curl -u admin:admin -H "X-Requested-By:ambari" -i -X PUT -d '{"RequestInfo": {"context" :"Install Druid"}, "Body": {"ServiceInfo": {"maintenance_state" : "OFF", "state": "INSTALLED"}}}' http://$AMBARI_HOST:8080/api/v1/clusters/$CLUSTER_NAME/services/DRUID | grep "id" | grep -Po '([0-9]+)')
-       		 	echo "*********************************AMBARI TaskID " $TASKID
-       		done
-       	fi
-       	
-       	echo "*********************************AMBARI TaskID " $TASKID
-       	sleep 2
-       	LOOPESCAPE="false"
-       	until [ "$LOOPESCAPE" == true ]; do
-               	TASKSTATUS=$(curl -u admin:admin -X GET http://$AMBARI_HOST:8080/api/v1/clusters/$CLUSTER_NAME/requests/$TASKID | grep "request_status" | grep -Po '([A-Z]+)')
-               	if [ "$TASKSTATUS" == COMPLETED ]; then
-                       	LOOPESCAPE="true"
-               	fi
-               	echo "*********************************Task Status" $TASKSTATUS
-               	sleep 2
-       	done
-}
 
 instalHDFManagementPack () {
 	wget http://public-repo-1.hortonworks.com/HDF/centos7/3.x/updates/3.0.0.0/tars/hdf_ambari_mp/hdf-ambari-mpack-3.0.0.0-453.tar.gz
@@ -499,48 +274,8 @@ configureAmbariRepos (){
 	curl -u admin:admin -d @$ROOT_PATH/CloudBreakArtifacts/hdf-config/api-payload/repo_update.json -H "X-Requested-By: ambari" -X PUT http://$AMBARI_HOST:8080/api/v1/stacks/HDP/versions/2.6/repository_versions/1
 }
 
-installMySQL (){
-	yum remove -y mysql57-community*
-	yum remove -y mysql56-server*
-	yum remove -y mysql-community*
-	rm -Rvf /var/lib/mysql
-
-	yum install -y epel-release
-	yum install -y libffi-devel.x86_64
-	ln -s /usr/lib64/libffi.so.6 /usr/lib64/libffi.so.5
-
-	yum install -y mysql-connector-java*
-	ambari-server setup --jdbc-db=mysql --jdbc-driver=/usr/share/java/mysql-connector-java.jar
 
 
-	if [ $(cat /etc/system-release|grep -Po Amazon) == Amazon ]; then       	
-		yum install -y mysql56-server
-		service mysqld start
-	else
-		yum localinstall -y https://dev.mysql.com/get/mysql-community-release-el7-5.noarch.rpm
-		yum install -y mysql-community-server
-		#yum localinstall -y https://dev.mysql.com/get/mysql57-community-release-el7-8.noarch.rpm
-#yum install -y mysql-community-server
-		systemctl start mysqld.service
-	fi
-}
-
-setupHDFDataStores (){
-	mysql --execute="CREATE DATABASE registry"
-	mysql --execute="CREATE DATABASE streamline"
-	mysql --execute="CREATE DATABASE druid DEFAULT CHARACTER SET utf8"
-	mysql --execute="CREATE DATABASE superset DEFAULT CHARACTER SET utf8"
-	mysql --execute="CREATE USER 'registry'@'%' IDENTIFIED BY 'registry'"
-	mysql --execute="CREATE USER 'streamline'@'%' IDENTIFIED BY 'streamline'"
-	mysql --execute="CREATE USER 'druid'@'%' IDENTIFIED BY 'druid'"
-	mysql --execute="CREATE USER 'superset'@'%' IDENTIFIED BY 'superset'"
-	mysql --execute="GRANT ALL PRIVILEGES ON registry.* TO 'registry'@'%' WITH GRANT OPTION"
-	mysql --execute="GRANT ALL PRIVILEGES ON streamline.* TO 'streamline'@'%' WITH GRANT OPTION"
-	mysql --execute="GRANT ALL PRIVILEGES ON druid.* TO 'druid'@'%' WITH GRANT OPTION"
-	mysql --execute="GRANT ALL PRIVILEGES ON superset.* TO 'superset'@'%' WITH GRANT OPTION"
-	mysql --execute="FLUSH PRIVILEGES"
-	mysql --execute="COMMIT"
-}
 
 echo "*********************************Waiting for cluster install to complete..."
 waitForServiceToStart YARN
@@ -557,90 +292,27 @@ export VERSION=`hdp-select status hadoop-client | sed 's/hadoop-client - \([0-9]
 export INTVERSION=$(echo $VERSION*10 | bc | grep -Po '([0-9][0-9])')
 echo "*********************************HDP VERSION IS: $VERSION"
 
-sed -r -i 's;\{\{mysql_host\}\};'$AMBARI_HOST';' $ROOT_PATH/CloudBreakArtifacts/hdf-config/registry-config/registry-common.json
-sed -r -i 's;\{\{mysql_host\}\};'$AMBARI_HOST';' $ROOT_PATH/CloudBreakArtifacts/hdf-config/streamline-config/streamline-common.json
-sed -r -i 's;\{\{registry_host\}\};'$AMBARI_HOST';' $ROOT_PATH/CloudBreakArtifacts/hdf-config/streamline-config/streamline-common.json
-sed -r -i 's;\{\{superset_host\}\};'$AMBARI_HOST';' $ROOT_PATH/CloudBreakArtifacts/hdf-config/streamline-config/streamline-common.json
-sed -r -i 's;\{\{mysql_host\}\};'$AMBARI_HOST';' $ROOT_PATH/CloudBreakArtifacts/hdf-config/druid-config/druid-common.json
-sed -r -i 's;\{\{mysql_host\}\};'$AMBARI_HOST';' $ROOT_PATH/CloudBreakArtifacts/hdf-config/druid-config/druid-superset.json
-
 echo "*********************************Stopping Prometheous..."
 kill -9 $(netstat -nlp|grep 9090|grep -Po '[0-9]+/[a-zA-Z]+'|grep -Po '[0-9]+')
 
-echo "*********************************Install TRUCKING_DEMO_CONTROL service..."
-cp -Rf $ROOT_PATH/CloudBreakArtifacts/recipes/TRUCKING_DEMO_CONTROL /var/lib/ambari-server/resources/stacks/HDP/$VERSION/services/
+
 
 echo "*********************************Install HDF Management Pack..."
 instalHDFManagementPack 
 sleep 2
 
-#echo "*********************************Configure Ambari Repos"
-#configureAmbariRepos
-#sleep 2
 
-echo "*********************************Install MySQL..."
-installMySQL
-sleep 2
 
-echo "*********************************Setup DBs for HDF Services..."
-setupHDFDataStores
-sleep 2
 
-sleep 2
-installDruidService
 
-sleep 2
-DRUID_STATUS=$(getServiceStatus DRUID)
-echo "*********************************Checking DRUID status..."
-if ! [[ $DRUID_STATUS == STARTED || $DRUID_STATUS == INSTALLED ]]; then
-       	echo "*********************************DRUID is in a transitional state, waiting..."
-       	waitForService DRUID
-       	echo "*********************************DRUID has entered a ready state..."
-fi
-
-if [[ $DRUID_STATUS == INSTALLED ]]; then
-       	startService DRUID
-else
-       	echo "*********************************DRUID Service Started..."
-fi
 
 sleep 2
 installSchemaRegistryService
 
-sleep 2
-REGISTRY_STATUS=$(getServiceStatus REGISTRY)
-echo "*********************************Checking REGISTRY status..."
-if ! [[ $REGISTRY_STATUS == STARTED || $REGISTRY_STATUS == INSTALLED ]]; then
-       	echo "*********************************REGISTRY is in a transitional state, waiting..."
-       	waitForService REGISTRY
-       	echo "*********************************REGISTRY has entered a ready state..."
-fi
 
-if [[ $REGISTRY_STATUS == INSTALLED ]]; then
-       	startService REGISTRY
-else
-       	echo "*********************************REGISTRY Service Started..."
-fi
 
 sleep 2
-installStreamlineService
 
-sleep 2
-STREAMLINE_STATUS=$(getServiceStatus STREAMLINE)
-echo "*********************************Checking STREAMLINE status..."
-if ! [[ $STREAMLINE_STATUS == STARTED || $STREAMLINE_STATUS == INSTALLED ]]; then
-       	echo "*********************************STREAMLINE is in a transitional state, waiting..."
-       	waitForService STREAMLINE
-       	echo "*********************************STREAMLINE has entered a ready state..."
-fi
-
-if [[ $STREAMLINE_STATUS == INSTALLED ]]; then
-       	startService STREAMLINE
-else
-       	echo "*********************************STREAMLINE Service Started..."
-fi
-
-sleep 2
 installNifiService
 
 sleep 2
@@ -658,10 +330,6 @@ else
        	echo "*********************************NIFI Service Started..."
 fi
 
-#Add symbolic links to Atlas Hooks
-ln -s /usr/hdp/current/atlas-client/hook/storm/atlas-plugin-classloader-0.8.0.2.6.1.0-34.jar /usr/hdf/current/storm-client/lib/atlas-plugin-classloader.jar
-
-ln -s /usr/hdp/current/atlas-client/hook/storm/storm-bridge-shim-0.8.0.2.6.1.0-34.jar /usr/hdf/current/storm-client/lib/storm-bridge-shim.jar
 
 #export MYSQL_TEMP_PASSWORD=$(grep 'A temporary password' /var/log/mysqld.log |grep -Po ': .+'|grep -Po '[^: ].+')
 #mysqladmin -u root --password=$MYSQL_TEMP_PASSWORD password "Password!1"
