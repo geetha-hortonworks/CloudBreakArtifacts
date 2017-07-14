@@ -437,7 +437,7 @@ waitForServiceToStart YARN
 
 waitForServiceToStart HDFS
 
-
+waitForServiceToStart HIVE
 
 waitForServiceToStart ZOOKEEPER
 
