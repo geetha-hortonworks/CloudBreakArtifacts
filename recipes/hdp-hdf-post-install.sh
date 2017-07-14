@@ -457,7 +457,20 @@ echo "*********************************Install HDF Management Pack..."
 instalHDFManagementPack 
 sleep 2
 
+#Start Kafka
+KAFKA_STATUS=$(getServiceStatus KAFKA)
+echo "*********************************Checking KAFKA status..."
+if ! [[ $KAFKA_STATUS == STARTED || $KAFKA_STATUS == INSTALLED ]]; then
+       	echo "*********************************KAFKA is in a transitional state, waiting..."
+       	waitForService KAFKA
+       	echo "*********************************KAFKA has entered a ready state..."
+fi
 
+if [[ $KAFKA_STATUS == INSTALLED ]]; then
+       	startService KAFKA
+else
+       	echo "*********************************KAFKA Service Started..."
+fi
 #Configure Kafka
  echo "*********************************Creating Kafka Topics..."
  /usr/hdp/current/kafka-broker/bin/kafka-topics.sh --create --zookeeper $AMBARI_HOST:2181 --replication-factor 1 --partitions 1 --topic cdr
@@ -548,20 +561,7 @@ deployTemplateToNifi
 echo "*********************************Starting NIFI Flow ..."
 startNifiFlow
 
-#Start Kafka
-KAFKA_STATUS=$(getServiceStatus KAFKA)
-echo "*********************************Checking KAFKA status..."
-if ! [[ $KAFKA_STATUS == STARTED || $KAFKA_STATUS == INSTALLED ]]; then
-       	echo "*********************************KAFKA is in a transitional state, waiting..."
-       	waitForService KAFKA
-       	echo "*********************************KAFKA has entered a ready state..."
-fi
 
-if [[ $KAFKA_STATUS == INSTALLED ]]; then
-       	startService KAFKA
-else
-       	echo "*********************************KAFKA Service Started..."
-fi
 
 #Configure Kafka
 # echo "*********************************Creating Kafka Topics..."
