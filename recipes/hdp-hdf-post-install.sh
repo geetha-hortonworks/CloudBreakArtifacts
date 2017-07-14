@@ -349,7 +349,7 @@ installSolr (){
 #sudo -u hdfs hadoop fs -mkdir /user/solr
 #sudo -u hdfs hadoop fs -chown solr /user/solr
 
-yum install lucidworks-hdpsearch
+yum -y install lucidworks-hdpsearch
 
 cp /root/telco-cdr-monitoring/solr/* /opt/lucidworks-hdpsearch/solr/server/solr-webapp/webapp/banana/app/dashboards/
 
