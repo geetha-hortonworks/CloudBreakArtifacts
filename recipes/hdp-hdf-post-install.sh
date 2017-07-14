@@ -515,8 +515,17 @@ cd $ROOT_PATH/telco-cdr-monitoring
 mvn clean package
 # cp -vf /root/target/telco-cdr-monitoring-1.0-SNAPSHOT.jar /home/storm
 # Deploy Storm toppology
+mkdir $ROOT_PATH/telco-cdr-monitoring/execdir
 
-storm jar $ROOT_PATH/telco-cdr-monitoring/target/telco-cdr-monitoring-1.0-SNAPSHOT.jar com.github.gbraccialli.telco.cdr.storm.Topology $ROOT_PATH/telco-cdr-monitoring/conf/topology.props
+mv $ROOT_PATH/telco-cdr-monitoring/target/telco-cdr-monitoring-1.0-SNAPSHOT.jar  $ROOT_PATH/telco-cdr-monitoring/execdir/
+
+mv $ROOT_PATH/telco-cdr-monitoring/scripts/start_cdr_producer.sh  $ROOT_PATH/telco-cdr-monitoring/execdir/
+
+chown nifi:nifi $ROOT_PATH/telco-cdr-monitoring/execdir/
+chown nifi:nifi $ROOT_PATH/telco-cdr-monitoring/execdir/*
+chmod 755 $ROOT_PATH/telco-cdr-monitoring/execdir/
+chmod 755 $ROOT_PATH/telco-cdr-monitoring/execdir/*
+storm jar $ROOT_PATH/telco-cdr-monitoring/execdir/telco-cdr-monitoring-1.0-SNAPSHOT.jar com.github.gbraccialli.telco.cdr.storm.Topology $ROOT_PATH/telco-cdr-monitoring/conf/topology.props
 
 
 
