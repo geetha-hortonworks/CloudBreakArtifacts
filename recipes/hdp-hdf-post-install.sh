@@ -349,6 +349,7 @@ installSolr (){
 sudo -u hdfs hadoop fs -mkdir /user/solr
 sudo -u hdfs hadoop fs -chown solr /user/solr
 
+yum install lucidworks-hdpsearch
 
 cp /root/telco-cdr-monitoring/solr/* /opt/lucidworks-hdpsearch/solr/server/solr-webapp/webapp/banana/app/dashboards/
 
@@ -457,6 +458,36 @@ echo "*********************************Install HDF Management Pack..."
 instalHDFManagementPack 
 sleep 2
 
+
+NAMENODE_HOST=$(getNameNodeHost)
+export NAMENODE_HOST=$NAMENODE_HOST
+
+ZK_HOST=$AMBARI_HOST
+export ZK_HOST=$ZK_HOST
+KAFKA_BROKER=$(getKafkaBroker)
+export KAFKA_BROKER=$KAFKA_BROKER
+# ATLAS_HOST=$(getAtlasHost)
+
+env
+
+echo "export NAMENODE_HOST=$NAMENODE_HOST" >> /etc/bashrc
+echo "export ZK_HOST=$ZK_HOST" >> /etc/bashrc
+echo "export KAFKA_BROKER=$KAFKA_BROKER" >> /etc/bashrc
+
+
+echo "export NIFI_HOST=$NIFI_HOST" >> /etc/bashrc
+
+echo "export NAMENODE_HOST=$NAMENODE_HOST" >> ~/.bash_profile
+echo "export ZK_HOST=$ZK_HOST" >> ~/.bash_profile
+echo "export KAFKA_BROKER=$KAFKA_BROKER" >> ~/.bash_profile
+
+
+echo "export NIFI_HOST=$NIFI_HOST" >> ~/.bash_profile
+
+. ~/.bash_profile
+
+echo "*********************************Installing Utlities..."
+installUtils
 #Start Kafka
 KAFKA_STATUS=$(getServiceStatus KAFKA)
 echo "*********************************Checking KAFKA status..."
@@ -490,37 +521,6 @@ mvn clean package
 
 storm jar $ROOT_PATH/telco-cdr-monitoring/target/telco-cdr-monitoring-1.0-SNAPSHOT.jar com.github.gbraccialli.telco.cdr.storm.Topology $ROOT_PATH/telco-cdr-monitoring/conf/topology.props
 
-
-
-NAMENODE_HOST=$(getNameNodeHost)
-export NAMENODE_HOST=$NAMENODE_HOST
-
-ZK_HOST=$AMBARI_HOST
-export ZK_HOST=$ZK_HOST
-KAFKA_BROKER=$(getKafkaBroker)
-export KAFKA_BROKER=$KAFKA_BROKER
-# ATLAS_HOST=$(getAtlasHost)
-
-env
-
-echo "export NAMENODE_HOST=$NAMENODE_HOST" >> /etc/bashrc
-echo "export ZK_HOST=$ZK_HOST" >> /etc/bashrc
-echo "export KAFKA_BROKER=$KAFKA_BROKER" >> /etc/bashrc
-
-
-echo "export NIFI_HOST=$NIFI_HOST" >> /etc/bashrc
-
-echo "export NAMENODE_HOST=$NAMENODE_HOST" >> ~/.bash_profile
-echo "export ZK_HOST=$ZK_HOST" >> ~/.bash_profile
-echo "export KAFKA_BROKER=$KAFKA_BROKER" >> ~/.bash_profile
-
-
-echo "export NIFI_HOST=$NIFI_HOST" >> ~/.bash_profile
-
-. ~/.bash_profile
-
-echo "*********************************Installing Utlities..."
-installUtils
 
 
 
