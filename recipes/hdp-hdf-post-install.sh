@@ -546,8 +546,8 @@ else
 fi
 
 echo "***************************************** RUN NIF AS ROOT instead of NIFI... "
-sed -i "s/##run.as=root/run.as=root/"  /usr/hdf/current/nifi/conf/bootstrap.conf
-sed -i "s/run.as=nifi/#run.as=nifi/"  /usr/hdf/current/nifi/conf/bootstrap.conf
+#sed -i "s/##run.as=root/run.as=root/"  /usr/hdf/current/nifi/conf/bootstrap.conf
+#sed -i "s/run.as=nifi/#run.as=nifi/"  /usr/hdf/current/nifi/conf/bootstrap.conf
 waitForNifiServlet
 
 
