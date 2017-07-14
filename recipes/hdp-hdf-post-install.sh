@@ -342,6 +342,29 @@ startNifiFlow () {
 	# fi
 }
 
+# install Solr
+installSolr (){
+
+
+sudo -u hdfs hadoop fs -mkdir /user/solr
+sudo -u hdfs hadoop fs -chown solr /user/solr
+
+
+cp /root/telco-cdr-monitoring/solr/* /opt/lucidworks-hdpsearch/solr/server/solr-webapp/webapp/banana/app/dashboards/
+
+chown -R solr:solr /opt/lucidworks-hdpsearch/solr
+
+sudo -u solr /opt/lucidworks-hdpsearch/solr/bin/solr start -c -z  $AMBARI_HOST:2181
+
+sleep 5
+
+sudo -u solr /opt/lucidworks-hdpsearch/solr/bin/solr create -c cdr \
+   -d data_driven_schema_configs \
+   -s 1 \
+   -rf 1
+   
+   }
+
 getNameNodeHost () {
        	NAMENODE_HOST=$(curl -u admin:admin -X GET http://$AMBARI_HOST:8080/api/v1/clusters/$CLUSTER_NAME/services/HDFS/components/NAMENODE|grep "host_name"|grep -Po ': "([a-zA-Z0-9\-_!?.]+)'|grep -Po '([a-zA-Z0-9\-_!?.]+)')
 
@@ -438,7 +461,10 @@ sleep 2
 #Configure Kafka
  echo "*********************************Creating Kafka Topics..."
  /usr/hdp/current/kafka-broker/bin/kafka-topics.sh --create --zookeeper $AMBARI_HOST:2181 --replication-factor 1 --partitions 1 --topic cdr
-
+ 
+ 
+ #Install Solr
+ installSolr 
 
 sleep 2
 # Build storm jar from source
