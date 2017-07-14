@@ -437,11 +437,11 @@ waitForServiceToStart YARN
 
 waitForServiceToStart HDFS
 
-waitForServiceToStart HIVE
+
 
 waitForServiceToStart ZOOKEEPER
 
-waitForServiceToStart KAFKA
+
 sleep 10
 
 export VERSION=`hdp-select status hadoop-client | sed 's/hadoop-client - \([0-9]\.[0-9]\).*/\1/'`
