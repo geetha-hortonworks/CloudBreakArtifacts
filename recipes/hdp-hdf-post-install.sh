@@ -435,6 +435,22 @@ instalHDFManagementPack
 sleep 2
 
 
+#Configure Kafka
+ echo "*********************************Creating Kafka Topics..."
+ /usr/hdp/current/kafka-broker/bin/kafka-topics.sh --create --zookeeper $AMBARI_HOST:2181 --replication-factor 1 --partitions 1 --topic cdr
+
+
+sleep 2
+# Build storm jar from source
+
+echo "*********************************Building CDR Storm Topology"
+cd $ROOT_PATH/telco-cdr-monitoring
+mvn clean package
+# cp -vf /root/target/telco-cdr-monitoring-1.0-SNAPSHOT.jar /home/storm
+# Deploy Storm toppology
+
+storm jar $ROOT_PATH/telco-cdr-monitoring/target/telco-cdr-monitoring-1.0-SNAPSHOT.jar com.github.gbraccialli.telco.cdr.storm.Topology $ROOT_PATH/telco-cdr-monitoring/conf/topology.props
+
 
 
 NAMENODE_HOST=$(getNameNodeHost)
@@ -467,22 +483,6 @@ echo "export NIFI_HOST=$NIFI_HOST" >> ~/.bash_profile
 echo "*********************************Installing Utlities..."
 installUtils
 
-#Configure Kafka
- echo "*********************************Creating Kafka Topics..."
- /usr/hdp/current/kafka-broker/bin/kafka-topics.sh --create --zookeeper $AMBARI_HOST:2181 --replication-factor 1 --partitions 1 --topic cdr
-
-
-# Build storm jar from source
-
-echo "*********************************Building CDR Storm Topology"
-cd $ROOT_PATH/telco-cdr-monitoring
-mvn clean package
-# cp -vf /root/target/telco-cdr-monitoring-1.0-SNAPSHOT.jar /home/storm
-# Deploy Storm toppology
-
-storm jar $ROOT_PATH/telco-cdr-monitoring/target/telco-cdr-monitoring-1.0-SNAPSHOT.jar com.github.gbraccialli.telco.cdr.storm.Topology $ROOT_PATH/telco-cdr-monitoring/conf/topology.props
-
-
 
 
 sleep 2
@@ -508,7 +508,14 @@ if [[ $NIFI_STATUS == INSTALLED ]]; then
 else
        	echo "*********************************NIFI Service Started..."
 fi
+
+echo "***************************************** RUN NIF AS ROOT instead of NIFI... "
+sed -i "s/##run.as=root/run.as=root/"  /usr/hdf/current/nifi/conf/bootstrap.conf
+sed -i "s/run.as=nifi/#run.as=nifi/"  /usr/hdf/current/nifi/conf/bootstrap.conf
 waitForNifiServlet
+
+
+
 echo "*********************************Deploying NIFI Template..."
 deployTemplateToNifi
 
