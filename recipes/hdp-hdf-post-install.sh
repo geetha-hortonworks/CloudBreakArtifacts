@@ -519,7 +519,7 @@ mvn clean package
 
 #mv $ROOT_PATH/telco-cdr-monitoring/target/telco-cdr-monitoring-1.0-SNAPSHOT.jar  $ROOT_PATH/telco-cdr-monitoring/execdir/
 
-cp $ROOT_PATH/telco-cdr-monitoring/scripts/start_cdr_producer.sh  /usr/hdf/3.0.0.0-453/nifi/
+#cp $ROOT_PATH/telco-cdr-monitoring/scripts/start_cdr_producer.sh  /usr/hdf/3.0.0.0-453/nifi/
 
 #chown nifi:nifi $ROOT_PATH/telco-cdr-monitoring/execdir/
 #chown nifi:nifi $ROOT_PATH/telco-cdr-monitoring/execdir/*
@@ -559,7 +559,8 @@ echo "***************************************** RUN NIF AS ROOT instead of NIFI.
 #sed -i "s/run.as=nifi/#run.as=nifi/"  /usr/hdf/current/nifi/conf/bootstrap.conf
 waitForNifiServlet
 
-
+echo "********************************* Copy producer script to Nifi folder"
+cp $ROOT_PATH/telco-cdr-monitoring/scripts/start_cdr_producer.sh  /usr/hdf/3.0.0.0-453/nifi/
 
 echo "*********************************Deploying NIFI Template..."
 deployTemplateToNifi
