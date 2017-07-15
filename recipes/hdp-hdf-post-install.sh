@@ -561,6 +561,7 @@ waitForNifiServlet
 
 echo "********************************* Copy producer script to Nifi folder"
 cp $ROOT_PATH/telco-cdr-monitoring/scripts/start_cdr_producer.sh  /usr/hdf/3.0.0.0-453/nifi/
+cp $ROOT_PATH/telco-cdr-monitoring/target/telco-cdr-monitoring-1.0-SNAPSHOT.jar /usr/hdf/3.0.0.0-453/nifi/
 
 echo "*********************************Deploying NIFI Template..."
 deployTemplateToNifi
