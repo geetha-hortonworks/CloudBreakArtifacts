@@ -262,7 +262,7 @@ waitForNifiServlet () {
 # Import NIFI Template
 deployTemplateToNifi () {
        	echo "*********************************Importing NIFI Template..."
-       	TEMPLATEID=$(curl -v -F template=@"$ROOT_PATH/CloudBreakArtifacts/Nifi/cdr-nifi.telco.xml" -X POST http://$AMBARI_HOST:9090/nifi-api/process-groups/root/templates/upload | grep -Po '<id>([a-z0-9-]+)' | grep -Po '>([a-z0-9-]+)' | grep -Po '([a-z0-9-]+)')
+       	TEMPLATEID=$(curl -v -F template=@"$ROOT_PATH/CloudBreakArtifacts/Nifi/nifi-cdr-cbd.xml" -X POST http://$AMBARI_HOST:9090/nifi-api/process-groups/root/templates/upload | grep -Po '<id>([a-z0-9-]+)' | grep -Po '>([a-z0-9-]+)' | grep -Po '([a-z0-9-]+)')
        	sleep 1
 
        	echo "*********************************Instantiating NIFI Flow..."
