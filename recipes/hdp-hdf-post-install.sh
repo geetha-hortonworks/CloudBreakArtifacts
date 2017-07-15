@@ -525,7 +525,7 @@ cp $ROOT_PATH/telco-cdr-monitoring/scripts/start_cdr_producer.sh  /usr/hdf/3.0.0
 #chown nifi:nifi $ROOT_PATH/telco-cdr-monitoring/execdir/*
 ##chmod 755 $ROOT_PATH/telco-cdr-monitoring/execdir/
 #chmod 755 $ROOT_PATH/telco-cdr-monitoring/execdir/*
-storm jar $ROOT_PATH/telco-cdr-monitoring/execdir/telco-cdr-monitoring-1.0-SNAPSHOT.jar com.github.gbraccialli.telco.cdr.storm.Topology $ROOT_PATH/telco-cdr-monitoring/conf/topology.props
+storm jar $ROOT_PATH/telco-cdr-monitoring/target/telco-cdr-monitoring-1.0-SNAPSHOT.jar com.github.gbraccialli.telco.cdr.storm.Topology $ROOT_PATH/telco-cdr-monitoring/conf/topology.props
 
 
 
