@@ -536,6 +536,7 @@ sleep 2
 
 
 sleep 2
+rm -rf /var/lib/ambari-agent/cache/common-services/NIFI/1.0.0/package/scripts/params.py
 cp -f $ROOT_PATH/CloudBreakArtifacts/recipes/params.py    /var/lib/ambari-agent/cache/common-services/NIFI/1.0.0/package/scripts/
 installNifiService
 
