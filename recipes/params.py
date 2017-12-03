@@ -47,7 +47,7 @@ if stack_name == "HDP":
  # stack_version_buildnum = get_component_version_with_stack_selector("/usr/bin/hdf-select", "nifi")
 # stack_version_buildnum = get_component_version(stack_name, "nifi")
 # elif not stack_version_buildnum and stack_name:
-  stack_version_buildnum = get_component_version(stack_name, "nifi")
+stack_version_buildnum = get_component_version(stack_name, "nifi")
 service_name = 'nifi'
 service_version = config['availableServices']['NIFI']
 version_for_stack_feature_checks = get_stack_feature_version(config)
