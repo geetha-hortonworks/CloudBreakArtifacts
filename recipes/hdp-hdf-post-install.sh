@@ -220,15 +220,16 @@ installNifiService () {
        	curl -u admin:admin -H "X-Requested-By:ambari" -i -X POST http://$AMBARI_HOST:8080/api/v1/clusters/$CLUSTER_NAME/hosts/$AMBARI_HOST/host_components/NIFI_CA
 
        	sleep 30
-       	echo "************* REMOVING existing param.py file from Nifi scripts*************"
-rm -rf /var/lib/ambari-agent/cache/common-services/NIFI/1.0.0/package/scripts/params.py
-echo "********************COPYING params.py file from recipes to scripts***********"
-cp -f $ROOT_PATH/CloudBreakArtifacts/recipes/params.py    /var/lib/ambari-agent/cache/common-services/NIFI/1.0.0/package/scripts/
-
+       
        	echo "*********************************Installing NIFI Service"
        	# Install NIFI Service
        	TASKID=$(curl -u admin:admin -H "X-Requested-By:ambari" -i -X PUT -d '{"RequestInfo": {"context" :"Install Nifi"}, "Body": {"ServiceInfo": {"maintenance_state" : "OFF", "state": "INSTALLED"}}}' http://$AMBARI_HOST:8080/api/v1/clusters/$CLUSTER_NAME/services/NIFI | grep "id" | grep -Po '([0-9]+)')
-		
+		sleep 10
+		echo "************* REMOVING existing param.py file from Nifi scripts*************"
+rm -rf /var/lib/ambari-agent/cache/common-services/NIFI/1.0.0/package/scripts/params.py
+echo "********************COPYING params.py file from recipes to scripts***********"
+cp -f $ROOT_PATH/CloudBreakArtifacts/recipes/params.py  /var/lib/ambari-agent/cache/common-services/NIFI/1.0.0/package/scripts/
+
 		sleep 2       	
        	if [ -z $TASKID ]; then
        		until ! [ -z $TASKID ]; do
