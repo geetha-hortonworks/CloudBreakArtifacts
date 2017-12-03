@@ -235,11 +235,14 @@ installNifiService () {
        	
        	echo "*********************************AMBARI TaskID " $TASKID
        	sleep 2
-       	LOOPESCAPE="false"
-       	until [ "$LOOPESCAPE" == true ]; do
+       #	LOOPESCAPE="false"
+       	until [ "$LOOPESCAPE" == false]; do
                	TASKSTATUS=$(curl -u admin:admin -X GET http://$AMBARI_HOST:8080/api/v1/clusters/$CLUSTER_NAME/requests/$TASKID | grep "request_status" | grep -Po '([A-Z]+)')
                	if [ "$TASKSTATUS" == FAILED ]; then
                	LOOPESCAPE="false"
+               	fi
+            echo "*********************************Task Status" $TASKSTATUS
+               	sleep 2
           done     	
                 
 echo "************* REMOVING existing param.py file from Nifi scripts*************"
