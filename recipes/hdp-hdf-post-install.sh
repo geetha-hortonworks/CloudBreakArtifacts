@@ -224,14 +224,7 @@ installNifiService () {
        	echo "*********************************Installing NIFI Service"
        	# Install NIFI Service
        	TASKID=$(curl -u admin:admin -H "X-Requested-By:ambari" -i -X PUT -d '{"RequestInfo": {"context" :"Install Nifi"}, "Body": {"ServiceInfo": {"maintenance_state" : "OFF", "state": "INSTALLED"}}}' http://$AMBARI_HOST:8080/api/v1/clusters/$CLUSTER_NAME/services/NIFI | grep "id" | grep -Po '([0-9]+)')
-		sleep 10
-		echo "************* REMOVING existing param.py file from Nifi scripts*************"
-rm -rf /var/lib/ambari-agent/cache/common-services/NIFI/1.0.0/package/scripts/params.py
-echo "********************CHANGING PERMISSIONS ON scripts***********"
-chmod -R 755 /var/lib/ambari-agent/cache/common-services/NIFI/1.0.0/package/scripts/
-echo "********************COPYING params.py file from recipes to scripts***********"
-cp -f $ROOT_PATH/CloudBreakArtifacts/recipes/params.py  /var/lib/ambari-agent/cache/common-services/NIFI/1.0.0/package/scripts/
-
+	
 		sleep 2       	
        	if [ -z $TASKID ]; then
        		until ! [ -z $TASKID ]; do
@@ -245,10 +238,31 @@ cp -f $ROOT_PATH/CloudBreakArtifacts/recipes/params.py  /var/lib/ambari-agent/ca
        	LOOPESCAPE="false"
        	until [ "$LOOPESCAPE" == true ]; do
                	TASKSTATUS=$(curl -u admin:admin -X GET http://$AMBARI_HOST:8080/api/v1/clusters/$CLUSTER_NAME/requests/$TASKID | grep "request_status" | grep -Po '([A-Z]+)')
+               	if [ "$TASKSTATUS" == FAILED ]; then
+               	LOOPESCAPE="false"
+          done     	
+                
+echo "************* REMOVING existing param.py file from Nifi scripts*************"
+rm -rf /var/lib/ambari-agent/cache/common-services/NIFI/1.0.0/package/scripts/params.py
+echo "********************CHANGING PERMISSIONS ON scripts***********"
+chmod -R 755 /var/lib/ambari-agent/cache/common-services/NIFI/1.0.0/package/scripts/
+echo "********************COPYING params.py file from recipes to scripts***********"
+cp -f $ROOT_PATH/CloudBreakArtifacts/recipes/params.py  /var/lib/ambari-agent/cache/common-services/NIFI/1.0.0/package/scripts/
+	
+    TASKID=$(curl -u admin:admin -H "X-Requested-By:ambari" -i -X PUT -d '{"RequestInfo": {"context" :"Install Nifi"}, "Body": {"ServiceInfo": {"maintenance_state" : "OFF", "state": "INSTALLED"}}}' http://$AMBARI_HOST:8080/api/v1/clusters/$CLUSTER_NAME/services/NIFI | grep "id" | grep -Po '([0-9]+)')
+              if [ -z $TASKID ]; then
+       		until ! [ -z $TASKID ]; do 
+       		TASKID=$(curl -u admin:admin -H "X-Requested-By:ambari" -i -X PUT -d '{"RequestInfo": {"context" :"Install Nifi"}, "Body": {"ServiceInfo": {"maintenance_state" : "OFF", "state": "INSTALLED"}}}' http://$AMBARI_HOST:8080/api/v1/clusters/$CLUSTER_NAME/services/NIFI | grep "id" | grep -Po '([0-9]+)')
+               	echo "*********************************AMBARI TaskID " $TASKID
+               	done
+            fi
+            sleep 2
+               	until [ "$LOOPESCAPE" == true ]; do
+               	TASKSTATUS=$(curl -u admin:admin -X GET http://$AMBARI_HOST:8080/api/v1/clusters/$CLUSTER_NAME/requests/$TASKID | grep "request_status" | grep -Po '([A-Z]+)')
                	if [ "$TASKSTATUS" == COMPLETED ]; then
                        	LOOPESCAPE="true"
                	fi
-               	echo "*********************************Task Status" $TASKSTATUS
+               	 echo "*********************************Task Status" $TASKSTATUS
                	sleep 2
        	done
 }
