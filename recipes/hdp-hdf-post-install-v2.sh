@@ -509,6 +509,15 @@ fi
 
 sleep 2
 
+
+echo "****************MOVING storm-jmetrics folder to usr/hdp/****/supervisor/contrib folder **************"
+cp -f  $ROOT_PATH/telco-cdr-monitoring/storm-jmxetric.tar.gz /usr/hdp/current/storm-supervisor/contrib/
+cp -f  $ROOT_PATH/telco-cdr-monitoring/storm-jmxetric.tar.gz /usr/hdp/current/storm-nimbus/contrib/
+cd   /usr/hdp/current/storm-supervisor/contrib/
+tar -zxvf storm-jmxetric.tar.gz  
+cd   /usr/hdp/current/storm-nimbus/contrib
+tar -zxvf storm-jmxetric.tar.gz  
+
 # Check storm status and start
 
 echo "*********************************Starting STORM Service..."
@@ -519,14 +528,6 @@ else
        	echo "*********************************STORM Service Started..."
 fi
 
-
-echo "****************MOVING storm-jmetrics folder to usr/hdp/****/supervisor/contrib folder **************"
-cp -f  $ROOT_PATH/telco-cdr-monitoring/storm-jmxetric.tar.gz /usr/hdp/current/storm-supervisor/contrib/
-cp -f  $ROOT_PATH/telco-cdr-monitoring/storm-jmxetric.tar.gz /usr/hdp/current/storm-nimbus/contrib/
-cd   /usr/hdp/current/storm-supervisor/contrib/
-tar -zxvf storm-jmxetric.tar.gz  
-cd   /usr/hdp/current/storm-nimbus/contrib
-tar -zxvf storm-jmxetric.tar.gz  
 
 # Build storm jar from source
 echo "*********************************Building CDR Storm Topology"
