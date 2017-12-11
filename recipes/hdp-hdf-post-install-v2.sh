@@ -508,12 +508,23 @@ fi
  installSolr 
 
 sleep 2
-# Build storm jar from source
+
+# Check storm status and start
+
+echo "*********************************Starting STORM Service..."
+STORM_STATUS=$(getServiceStatus STORM)
+if [[ $STORM_STATUS == INSTALLED ]]; then
+       	startService STORM
+else
+       	echo "*********************************STORM Service Started..."
+fi
+
 
 echo "****************MOVING storm-jmetrics folder to usr/hdp/****/supervisor/contrib folder **************"
 mv  $ROOT_PATH/telco-cdr-monitoring/storm-jmxetric.tar.gz /usr/hdp/current/storm-supervisor/contrib/
 tar -zxvf /usr/hdp/current/storm-supervisor/contrib/storm-jmxetric.tar.gz
 
+# Build storm jar from source
 echo "*********************************Building CDR Storm Topology"
 cd $ROOT_PATH/telco-cdr-monitoring
 mvn clean package
