@@ -522,7 +522,7 @@ fi
 
 echo "****************MOVING storm-jmetrics folder to usr/hdp/****/supervisor/contrib folder **************"
 mv  $ROOT_PATH/telco-cdr-monitoring/storm-jmxetric.tar.gz /usr/hdp/current/storm-supervisor/contrib/
-tar -zxvf /usr/hdp/current/storm-supervisor/contrib/storm-jmxetric.tar.gz
+tar -zxvf /usr/hdp/current/storm-supervisor/contrib/storm-jmxetric.tar.gz  --directory /usr/hdp/current/storm-supervisor/contrib/
 
 # Build storm jar from source
 echo "*********************************Building CDR Storm Topology"
