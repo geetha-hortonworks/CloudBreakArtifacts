@@ -523,7 +523,7 @@ sleep 2
 # echo "*********************************Starting STORM Service..."
 # STORM_STATUS=$(getServiceStatus STORM)
 # if [[ $STORM_STATUS == INSTALLED ]]; then
-       	startService STORM
+       	# startService STORM
 # else
  #      	echo "*********************************STORM Service Started..."
 # fi
